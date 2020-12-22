@@ -7,6 +7,7 @@ const beerH2 = beerDetails.querySelector('h2')
 const reviewForm = document.querySelector('.review-form')
 const reviewTextArea = reviewForm.querySelector('textarea')
 const reviewsUl = document.querySelector('ul.reviews')
+const beerMenuUl = document.querySelector('#beer-menu')
 
 // Initial Beer Info function definition
 const initialFetch = () => {
@@ -19,6 +20,8 @@ const initialFetch = () => {
 
     // Rendering Info for first beer
     const renderInfo = (beerObject) => {
+        beerDescriptionForm.dataset.id = beerObject.id
+        reviewForm.dataset.id = beerObject.id
         beerH2.textContent = beerObject.name
         beerImage.src = beerObject.image_url
         beerDescriptionTextArea.textContent = beerObject.description
@@ -67,5 +70,34 @@ const reviewFormEvent = (event) => {
 
 reviewForm.addEventListener('submit', reviewFormEvent)
 
+// Advanced: Initial Fetch for beer names to put in menu
+const initialBeerNamesFetch = () => {
+    fetch("http://localhost:3000/beers")
+        .then(response => response.json())
+        .then(beerObjects => {
+            beerObjects.forEach(renderBeerNames)
+        })
+}
+
+    //  Render beer Names to menu
+    const renderBeerNames = (beerObject) => {
+        const li = document.createElement('li')
+        li.textContent = beerObject.name 
+        li.dataset.id = beerObject.id
+        li.addEventListener('click', beerMenuLiEvent)
+        beerMenuUl.append(li)
+    }
+
+        // Show beer info when click on name
+        const beerMenuLiEvent = (event) => {
+            const id = event.target.dataset.id
+            fetch(`http://localhost:3000/beers/${id}`)
+                .then(response => response.json())
+                .then(beerObject => {
+                    renderInfo(beerObject)
+                })
+        }
+
 // Initial Fetch Function Call
+initialBeerNamesFetch()
 initialFetch()
