@@ -8,6 +8,7 @@ const reviewForm = document.querySelector('.review-form')
 const reviewTextArea = reviewForm.querySelector('textarea')
 const reviewsUl = document.querySelector('ul.reviews')
 const beerMenuUl = document.querySelector('#beer-menu')
+let beerReviewsArray;
 
 // Initial Beer Info function definition
 const initialFetch = () => {
@@ -24,18 +25,23 @@ const initialFetch = () => {
         reviewForm.dataset.id = beerObject.id
         beerH2.textContent = beerObject.name
         beerImage.src = beerObject.image_url
-        beerDescriptionTextArea.textContent = beerObject.description
+        beerDescriptionTextArea.value = beerObject.description
+        console.log(beerObject.reviews)
+        beerReviewsArray = beerObject.reviews
+        console.log(beerReviewsArray)
     }
 
 // Add event listener to beer description form
 const descriptionFormEvent = (event) => {
+    const id = event.target.dataset.id
     event.preventDefault()
-    updateDescription()
+    updateDescription(id)
+    event.target.reset()
 }
 
     // Update description in server and dom
-    const updateDescription = () => {
-        fetch("http://localhost:3000/beers/1", {
+    const updateDescription = (id) => {
+        fetch(`http://localhost:3000/beers/${id}`, {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",
@@ -48,7 +54,7 @@ const descriptionFormEvent = (event) => {
             .then(response => response.json())
             .then(updatedBeer => {
                 console.log(updatedBeer)
-                beerDescriptionTextArea.textContent = updatedBeer.description
+                beerDescriptionTextArea.value = updatedBeer.description
             })
     }
 
@@ -57,16 +63,38 @@ beerDescriptionForm.addEventListener('submit', descriptionFormEvent)
 // Add event listener to beer review
 const reviewFormEvent = (event) => {
     event.preventDefault()
-    updateReview()
-    event.target.reset()
+    beerReviewsArray.push(reviewTextArea.value)
+    const id = event.target.dataset.id
+        console.log(beerReviewsArray)
+    reviewsUl.innerHTML = ""
+        fetch(`http://localhost:3000/beers/${id}`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify({
+                reviews: beerReviewsArray
+            })
+        })
+            .then(response => response.json())
+            .then(updatedBeer => {
+                console.log(updatedBeer)
+                updatedBeer.reviews.forEach(renderReviews)
+            })
+
+        const renderReviews = (review) => {
+            const li = document.createElement('li')
+            li.textContent = review
+            reviewsUl.append(li)
+        }
+    
+
+    
 }
 
-    // Update review on dom, no persist yet
-    const updateReview = () => {
-        const li = document.createElement('li')
-        li.textContent = reviewTextArea.value
-        reviewsUl.append(li)
-    }
+    
+    
 
 reviewForm.addEventListener('submit', reviewFormEvent)
 
@@ -91,11 +119,21 @@ const initialBeerNamesFetch = () => {
         // Show beer info when click on name
         const beerMenuLiEvent = (event) => {
             const id = event.target.dataset.id
+            reviewsUl.innerHTML = ""
             fetch(`http://localhost:3000/beers/${id}`)
                 .then(response => response.json())
                 .then(beerObject => {
                     renderInfo(beerObject)
+                    beerObject.reviews.forEach(renderReviews)
                 })
+            
+            const renderReviews = (review) => {
+                const button = document.createElement('button')
+                button.textContent = "Delete Review"
+                const li = document.createElement('li')
+                li.textContent = review
+                reviewsUl.append(li)
+            }
         }
 
 // Initial Fetch Function Call
