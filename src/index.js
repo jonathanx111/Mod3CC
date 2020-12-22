@@ -4,6 +4,9 @@ const beerImage = beerDetails.querySelector('img')
 const beerDescriptionForm = document.querySelector('.description')
 const beerDescriptionTextArea = beerDescriptionForm.querySelector('textarea')
 const beerH2 = beerDetails.querySelector('h2')
+const reviewForm = document.querySelector('.review-form')
+const reviewTextArea = reviewForm.querySelector('textarea')
+const reviewsUl = document.querySelector('ul.reviews')
 
 // Initial Beer Info function definition
 const initialFetch = () => {
@@ -47,6 +50,22 @@ const descriptionFormEvent = (event) => {
     }
 
 beerDescriptionForm.addEventListener('submit', descriptionFormEvent)
+
+// Add event listener to beer review
+const reviewFormEvent = (event) => {
+    event.preventDefault()
+    updateReview()
+    event.target.reset()
+}
+
+    // Update review on dom, no persist yet
+    const updateReview = () => {
+        const li = document.createElement('li')
+        li.textContent = reviewTextArea.value
+        reviewsUl.append(li)
+    }
+
+reviewForm.addEventListener('submit', reviewFormEvent)
 
 // Initial Fetch Function Call
 initialFetch()
