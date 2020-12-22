@@ -10,13 +10,30 @@ const reviewsUl = document.querySelector('ul.reviews')
 const beerMenuUl = document.querySelector('#beer-menu')
 let beerReviewsArray;
 
+const renderReviews = (review) => {
+    const button = document.createElement('button')
+    button.textContent = "Delete Review"
+    const li = document.createElement('li')
+    button.addEventListener('click', buttonEvent)
+    li.textContent = review
+    li.append(button)
+    reviewsUl.append(li)
+}
+
+const buttonEvent = (event) => {
+    // const id = 
+    // fetch(`http://localhost:3000/beers/${id}`
+}
+
 // Initial Beer Info function definition
 const initialFetch = () => {
     fetch("http://localhost:3000/beers/1")
         .then(response => response.json())
         .then(firstBeer => {
             renderInfo(firstBeer)
+            firstBeer.reviews.forEach(renderReviews)
         })
+
 }
 
     // Rendering Info for first beer
@@ -28,7 +45,6 @@ const initialFetch = () => {
         beerDescriptionTextArea.value = beerObject.description
         console.log(beerObject.reviews)
         beerReviewsArray = beerObject.reviews
-        console.log(beerReviewsArray)
     }
 
 // Add event listener to beer description form
@@ -127,13 +143,6 @@ const initialBeerNamesFetch = () => {
                     beerObject.reviews.forEach(renderReviews)
                 })
             
-            const renderReviews = (review) => {
-                const button = document.createElement('button')
-                button.textContent = "Delete Review"
-                const li = document.createElement('li')
-                li.textContent = review
-                reviewsUl.append(li)
-            }
         }
 
 // Initial Fetch Function Call
