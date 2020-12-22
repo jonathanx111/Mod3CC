@@ -21,8 +21,30 @@ const renderReviews = (review) => {
 }
 
 const buttonEvent = (event) => {
-    // const id = 
-    // fetch(`http://localhost:3000/beers/${id}`
+    const id = reviewForm.dataset.id
+    const li = event.target.parentElement.textContent.replace("Delete Review", "")
+    console.log(li)
+    console.log(beerReviewsArray)
+    const currentIndex = beerReviewsArray.indexOf(li)
+    beerReviewsArray.splice(currentIndex, 1)
+    console.log(beerReviewsArray)
+    console.log(currentIndex)
+    reviewsUl.innerHTML = ""
+    fetch(`http://localhost:3000/beers/${id}`, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            reviews: beerReviewsArray
+        })
+    })
+    .then(response => response.json())
+    .then(beerObj => {
+        console.log(beerObj.reviews)
+        beerObj.reviews.forEach(renderReviews)
+    })
+    
 }
 
 // Initial Beer Info function definition
@@ -33,7 +55,6 @@ const initialFetch = () => {
             renderInfo(firstBeer)
             firstBeer.reviews.forEach(renderReviews)
         })
-
 }
 
     // Rendering Info for first beer
@@ -99,18 +120,10 @@ const reviewFormEvent = (event) => {
                 updatedBeer.reviews.forEach(renderReviews)
             })
 
-        const renderReviews = (review) => {
-            const li = document.createElement('li')
-            li.textContent = review
-            reviewsUl.append(li)
-        }
     
 
     
 }
-
-    
-    
 
 reviewForm.addEventListener('submit', reviewFormEvent)
 
